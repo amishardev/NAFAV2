@@ -1,0 +1,1017 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+  <meta name="description"
+    content="NAPA V2 BETA — Navdhi Advanced Pulse Analyser. Upload a photo of your dal bowl and get water content and nutrition in seconds." />
+  <title>NAPA V2 BETA — Navdhi Advanced Pulse Analyser</title>
+
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap"
+    rel="stylesheet" />
+
+  <style>
+    /* =====================================================
+       DESIGN TOKENS
+       ===================================================== */
+    :root {
+      --bg: #f9f9f7;
+      --surface: #ffffff;
+      --border: #e8e8e4;
+      --border-dashed: #d4d4cc;
+
+      --text-primary: #111110;
+      --text-secondary: #6b6b66;
+      --text-muted: #a8a8a2;
+
+      --black: #111110;
+      --white: #ffffff;
+
+      /* Pastel card accents — exactly from reference */
+      --card-water-bg: #eef7d4;
+      /* soft yellow-green */
+      --card-protein-bg: #d4f0e8;
+      /* soft mint-green   */
+      --card-calories-bg: #f5f5f3;
+      /* near-white grey   */
+      --card-carbs-bg: #fef3c7;
+      /* soft amber        */
+      --card-fat-bg: #fce7f3;
+      /* soft pink         */
+      --card-fiber-bg: #ede9fe;
+      /* soft violet       */
+
+      --radius-sm: 10px;
+      --radius-md: 16px;
+      --radius-lg: 20px;
+      --radius-xl: 28px;
+      --radius-pill: 99px;
+
+      --font: 'Inter', system-ui, -apple-system, sans-serif;
+      --ease: cubic-bezier(0.4, 0, 0.2, 1);
+    }
+
+    /* =====================================================
+       RESET
+       ===================================================== */
+    *,
+    *::before,
+    *::after {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    html {
+      font-size: 16px;
+      -webkit-text-size-adjust: 100%;
+    }
+
+    body {
+      font-family: var(--font);
+      background: var(--bg);
+      color: var(--text-primary);
+      min-height: 100dvh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      padding: 0 0 48px;
+      -webkit-font-smoothing: antialiased;
+    }
+
+    /* =====================================================
+       PAGE WRAPPER — phone-width on desktop
+       ===================================================== */
+    .page-wrap {
+      width: 100%;
+      max-width: 480px;
+      padding: 0 20px;
+    }
+
+    /* =====================================================
+       TOP NAV BAR
+       ===================================================== */
+    .top-nav {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 20px 20px 0;
+      width: 100%;
+      max-width: 480px;
+    }
+
+    .nav-logo {
+      display: flex;
+      align-items: center;
+      gap: 9px;
+      font-size: 15px;
+      font-weight: 700;
+      color: var(--text-primary);
+      letter-spacing: -0.01em;
+    }
+
+    .nav-logo-img {
+      height: 32px;
+      width: auto;
+      display: block;
+      flex-shrink: 0;
+      object-fit: contain;
+    }
+
+    .nav-badge {
+      background: var(--black);
+      color: var(--white);
+      font-size: 11px;
+      font-weight: 700;
+      letter-spacing: 0.08em;
+      padding: 6px 14px;
+      border-radius: var(--radius-pill);
+    }
+
+    /* =====================================================
+       HERO TEXT
+       ===================================================== */
+    .hero {
+      padding-top: 32px;
+      padding-bottom: 28px;
+    }
+
+    .hero-title {
+      font-size: clamp(32px, 9vw, 42px);
+      font-weight: 900;
+      line-height: 1.08;
+      letter-spacing: -0.03em;
+      color: var(--text-primary);
+      margin-bottom: 14px;
+    }
+
+    .hero-subtitle {
+      font-size: 15px;
+      color: var(--text-secondary);
+      line-height: 1.6;
+      font-weight: 400;
+      max-width: 320px;
+    }
+
+    /* =====================================================
+       UPLOAD ZONE
+       ===================================================== */
+    .upload-zone {
+      position: relative;
+      border: 2px dashed var(--border-dashed);
+      border-radius: var(--radius-xl);
+      background: var(--surface);
+      cursor: pointer;
+      padding: 44px 20px;
+      text-align: center;
+      transition: border-color 0.2s var(--ease), background 0.2s var(--ease);
+      overflow: hidden;
+      margin-bottom: 12px;
+    }
+
+    .upload-zone.drag-over {
+      border-color: var(--black);
+      background: #f4f4f0;
+    }
+
+    .upload-zone input[type="file"] {
+      position: absolute;
+      inset: 0;
+      opacity: 0;
+      cursor: pointer;
+      width: 100%;
+      height: 100%;
+    }
+
+    .upload-icon-wrap {
+      width: 56px;
+      height: 56px;
+      background: var(--white);
+      border-radius: 16px;
+      box-shadow: 0 2px 12px rgba(0, 0, 0, 0.10);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin: 0 auto 16px;
+      transition: transform 0.2s var(--ease);
+    }
+
+    .upload-zone:hover .upload-icon-wrap {
+      transform: scale(1.06);
+    }
+
+    .upload-icon-wrap svg {
+      width: 26px;
+      height: 26px;
+      stroke: var(--text-primary);
+      fill: none;
+      stroke-width: 1.8;
+      stroke-linecap: round;
+      stroke-linejoin: round;
+    }
+
+    .upload-primary-text {
+      font-size: 18px;
+      font-weight: 700;
+      color: var(--text-primary);
+      letter-spacing: -0.01em;
+      margin-bottom: 5px;
+    }
+
+    .upload-secondary-text {
+      font-size: 13px;
+      color: var(--text-muted);
+      font-weight: 400;
+    }
+
+    /* Preview shown after picking image */
+    .upload-preview {
+      display: none;
+      position: relative;
+      margin-top: 16px;
+      border-radius: var(--radius-md);
+      overflow: hidden;
+    }
+
+    .upload-preview img {
+      width: 100%;
+      max-height: 220px;
+      object-fit: cover;
+      display: block;
+      border-radius: var(--radius-md);
+    }
+
+    .remove-btn {
+      position: absolute;
+      top: 8px;
+      right: 8px;
+      background: rgba(255, 255, 255, 0.92);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-pill);
+      font-size: 11px;
+      font-weight: 600;
+      color: var(--text-secondary);
+      padding: 4px 12px;
+      cursor: pointer;
+      transition: color 0.15s, border-color 0.15s;
+      z-index: 2;
+    }
+
+    .remove-btn:hover {
+      color: #e11d48;
+      border-color: #e11d48;
+    }
+
+    /* =====================================================
+       TADKA ROW
+       ===================================================== */
+    .tadka-row {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-lg);
+      padding: 16px 20px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      margin-bottom: 12px;
+    }
+
+    .tadka-text-group .tadka-label {
+      font-size: 15px;
+      font-weight: 700;
+      color: var(--text-primary);
+      letter-spacing: -0.01em;
+    }
+
+    .tadka-text-group .tadka-desc {
+      font-size: 12px;
+      color: var(--text-muted);
+      margin-top: 2px;
+      font-weight: 400;
+    }
+
+    .tadka-toggle-group {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      flex-shrink: 0;
+    }
+
+    .tadka-toggle-group .toggle-side-label {
+      font-size: 13px;
+      color: var(--text-muted);
+      font-weight: 500;
+      min-width: 22px;
+    }
+
+    .tadka-toggle-group .toggle-side-label.right {
+      text-align: left;
+    }
+
+    /* Toggle switch */
+    .toggle-switch {
+      position: relative;
+      width: 46px;
+      height: 26px;
+    }
+
+    .toggle-switch input {
+      opacity: 0;
+      width: 0;
+      height: 0;
+      position: absolute;
+    }
+
+    .toggle-track {
+      display: block;
+      width: 46px;
+      height: 26px;
+      background: #d0d0ca;
+      border-radius: 99px;
+      cursor: pointer;
+      transition: background 0.2s;
+      position: relative;
+    }
+
+    .toggle-track::after {
+      content: '';
+      position: absolute;
+      top: 3px;
+      left: 3px;
+      width: 20px;
+      height: 20px;
+      border-radius: 50%;
+      background: #fff;
+      box-shadow: 0 1px 4px rgba(0, 0, 0, 0.2);
+      transition: transform 0.2s var(--ease);
+    }
+
+    .toggle-switch input:checked+.toggle-track {
+      background: var(--black);
+    }
+
+    .toggle-switch input:checked+.toggle-track::after {
+      transform: translateX(20px);
+    }
+
+    .toggle-switch input:focus-visible+.toggle-track {
+      outline: 2px solid var(--black);
+      outline-offset: 2px;
+    }
+
+    /* =====================================================
+       ANALYSE BUTTON
+       ===================================================== */
+    .btn-analyse {
+      width: 100%;
+      background: var(--black);
+      color: var(--white);
+      border: none;
+      border-radius: var(--radius-pill);
+      font-family: var(--font);
+      font-size: 17px;
+      font-weight: 700;
+      letter-spacing: -0.01em;
+      padding: 18px 24px;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 10px;
+      transition: opacity 0.2s, transform 0.15s var(--ease);
+      margin-bottom: 28px;
+    }
+
+    .btn-analyse:hover:not(:disabled) {
+      opacity: 0.88;
+      transform: translateY(-1px);
+    }
+
+    .btn-analyse:active:not(:disabled) {
+      transform: translateY(0);
+    }
+
+    .btn-analyse:disabled {
+      opacity: 0.4;
+      cursor: not-allowed;
+    }
+
+    .btn-analyse .btn-icon svg {
+      width: 18px;
+      height: 18px;
+      stroke: var(--white);
+      fill: none;
+      stroke-width: 2;
+      stroke-linecap: round;
+      stroke-linejoin: round;
+    }
+
+    /* Spinner */
+    .btn-spinner {
+      display: none;
+      width: 18px;
+      height: 18px;
+      border: 2px solid rgba(255, 255, 255, 0.3);
+      border-top-color: #fff;
+      border-radius: 50%;
+      animation: spin 0.65s linear infinite;
+    }
+
+    .btn-analyse.loading .btn-spinner {
+      display: block;
+    }
+
+    .btn-analyse.loading .btn-icon {
+      display: none;
+    }
+
+    .btn-analyse.loading .btn-label {
+      opacity: 0.7;
+    }
+
+    @keyframes spin {
+      to {
+        transform: rotate(360deg);
+      }
+    }
+
+    /* =====================================================
+       LOADING OVERLAY (full-screen during analysis)
+       ===================================================== */
+    .loading-overlay {
+      display: none;
+      position: fixed;
+      inset: 0;
+      background: rgba(249, 249, 247, 0.92);
+      backdrop-filter: blur(6px);
+      -webkit-backdrop-filter: blur(6px);
+      z-index: 100;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 20px;
+      animation: fadeIn 0.2s ease;
+    }
+
+    .loading-overlay.active {
+      display: flex;
+    }
+
+    @keyframes fadeIn {
+      from {
+        opacity: 0;
+      }
+
+      to {
+        opacity: 1;
+      }
+    }
+
+    .loading-spinner-large {
+      width: 52px;
+      height: 52px;
+      border: 3px solid rgba(0, 0, 0, 0.12);
+      border-top-color: var(--black);
+      border-radius: 50%;
+      animation: spin 0.8s linear infinite;
+    }
+
+    .loading-label {
+      font-size: 16px;
+      font-weight: 600;
+      color: var(--text-primary);
+      letter-spacing: -0.01em;
+    }
+
+    .loading-sub {
+      font-size: 13px;
+      color: var(--text-muted);
+      margin-top: -12px;
+    }
+
+    /* =====================================================
+       STATUS / ERROR MESSAGE
+       ===================================================== */
+    .status-msg {
+      display: none;
+      padding: 14px 16px;
+      border-radius: var(--radius-md);
+      font-size: 13px;
+      font-weight: 500;
+      line-height: 1.5;
+      margin-bottom: 20px;
+    }
+
+    .status-msg.error {
+      background: #fff1f2;
+      border: 1px solid #fecdd3;
+      color: #be123c;
+    }
+
+    /* =====================================================
+       RESULTS SECTION
+       ===================================================== */
+    .results-section {
+      display: none;
+      animation: slideUp 0.4s var(--ease) both;
+    }
+
+    @keyframes slideUp {
+      from {
+        opacity: 0;
+        transform: translateY(16px);
+      }
+
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    .results-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 14px;
+    }
+
+    .results-title-text {
+      font-size: 12px;
+      font-weight: 600;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      color: var(--text-muted);
+    }
+
+    .tadka-result-badge {
+      font-size: 11px;
+      font-weight: 700;
+      padding: 4px 12px;
+      border-radius: var(--radius-pill);
+    }
+
+    .tadka-result-badge.on {
+      background: #fef9c3;
+      color: #92400e;
+    }
+
+    .tadka-result-badge.off {
+      background: #f1f5f9;
+      color: var(--text-muted);
+    }
+
+    /* Stat cards grid — matches the reference bottom row */
+    .stat-cards {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 10px;
+      margin-bottom: 10px;
+    }
+
+    .stat-card {
+      border-radius: var(--radius-lg);
+      padding: 16px 14px 18px;
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+      transition: transform 0.2s var(--ease);
+      cursor: default;
+    }
+
+    .stat-card:hover {
+      transform: translateY(-2px);
+    }
+
+    .stat-card .card-label {
+      font-size: 12px;
+      font-weight: 600;
+      color: rgba(0, 0, 0, 0.5);
+      line-height: 1.3;
+    }
+
+    .stat-card .card-value {
+      font-size: 30px;
+      font-weight: 900;
+      letter-spacing: -0.04em;
+      color: var(--text-primary);
+      line-height: 1;
+      display: flex;
+      align-items: baseline;
+      gap: 1px;
+    }
+
+    .stat-card .card-value .unit {
+      font-size: 16px;
+      font-weight: 700;
+      letter-spacing: -0.02em;
+      opacity: 0.7;
+    }
+
+    /* Card colours — from reference */
+    .card-water {
+      background: var(--card-water-bg);
+    }
+
+    .card-protein {
+      background: var(--card-protein-bg);
+    }
+
+    .card-calories {
+      background: var(--card-calories-bg);
+      border: 1px solid var(--border);
+    }
+
+    .card-carbs {
+      background: var(--card-carbs-bg);
+    }
+
+    .card-fat {
+      background: var(--card-fat-bg);
+    }
+
+    .card-fiber {
+      background: var(--card-fiber-bg);
+    }
+
+    /* Second row of cards */
+    .stat-cards-row2 {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 10px;
+      margin-bottom: 28px;
+    }
+
+    /* =====================================================
+       FOOTER
+       ===================================================== */
+    .page-footer {
+      text-align: center;
+      font-size: 10px;
+      font-weight: 600;
+      letter-spacing: 0.15em;
+      text-transform: uppercase;
+      color: var(--text-muted);
+      padding-top: 8px;
+    }
+
+    /* =====================================================
+       RESPONSIVE — ensure it looks great on all phones
+       ===================================================== */
+    @media (max-width: 360px) {
+      .hero-title {
+        font-size: 28px;
+      }
+
+      .stat-card .card-value {
+        font-size: 24px;
+      }
+
+      .stat-card .card-value .unit {
+        font-size: 13px;
+      }
+
+      .stat-card .card-label {
+        font-size: 11px;
+      }
+    }
+  </style>
+</head>
+
+<body>
+
+  <!-- =====================================================
+       LOADING OVERLAY
+       ===================================================== -->
+  <div class="loading-overlay" id="loading-overlay" role="status" aria-live="polite"
+    aria-label="Analysing your dal bowl">
+    <div class="loading-spinner-large" aria-hidden="true"></div>
+    <p class="loading-label">Analysing your bowl…</p>
+    <p class="loading-sub">This usually takes a few seconds</p>
+  </div>
+
+  <!-- =====================================================
+       TOP NAV
+       ===================================================== -->
+  <nav class="top-nav" role="navigation" aria-label="Site navigation">
+    <div class="nav-logo">
+      <img class="nav-logo-img" src="https://github.com/amishardev/navdhiweb/blob/main/download.png?raw=true"
+        alt="Navdhi logo" loading="eager" decoding="async" />
+    </div>
+    <span class="nav-badge">V2 BETA</span>
+  </nav>
+
+  <!-- =====================================================
+       MAIN CONTENT
+       ===================================================== -->
+  <div class="page-wrap">
+
+    <!-- Hero -->
+    <header class="hero">
+      <h1 class="hero-title">Pulse Analysis,<br>Instantly.</h1>
+      <p class="hero-subtitle">Upload a photo of your dal bowl — get water content and full nutrition in seconds.</p>
+    </header>
+
+    <!-- Upload Zone -->
+    <div class="upload-zone" id="upload-zone" aria-label="Image upload area">
+      <input type="file" id="image-input" accept="image/*" capture="environment"
+        aria-label="Select or take a photo of your dal bowl" />
+
+      <div class="upload-icon-wrap" aria-hidden="true">
+        <svg viewBox="0 0 24 24">
+          <rect x="3" y="3" width="18" height="18" rx="3" ry="3" />
+          <circle cx="8.5" cy="8.5" r="1.5" />
+          <polyline points="21 15 16 10 5 21" />
+        </svg>
+      </div>
+      <p class="upload-primary-text">Tap to add a photo</p>
+      <p class="upload-secondary-text">Camera or gallery — JPG, PNG, WEBP</p>
+
+      <!-- Preview (shown after selection) -->
+      <div class="upload-preview" id="upload-preview">
+        <img id="preview-img" src="" alt="Preview of your selected dal bowl image" />
+        <button class="remove-btn" id="remove-btn" type="button" aria-label="Remove selected image">✕ Remove</button>
+      </div>
+    </div>
+
+    <!-- Tadka Row -->
+    <div class="tadka-row">
+      <div class="tadka-text-group">
+        <p class="tadka-label">Contains tadka</p>
+        <p class="tadka-desc">Changes the nutrition model</p>
+      </div>
+      <div class="tadka-toggle-group">
+        <span class="toggle-side-label" aria-hidden="true">No</span>
+        <label class="toggle-switch" for="tadka-toggle">
+          <input type="checkbox" id="tadka-toggle" name="tadka" />
+          <span class="toggle-track" aria-hidden="true"></span>
+          <span class="visually-hidden">Contains tadka</span>
+        </label>
+        <span class="toggle-side-label right" aria-hidden="true">Yes</span>
+      </div>
+    </div>
+
+    <!-- Error / status message -->
+    <div class="status-msg" id="status-msg" role="alert" aria-live="assertive"></div>
+
+    <!-- Analyse Button -->
+    <button class="btn-analyse" id="analyse-btn" type="button">
+      <span class="btn-spinner" aria-hidden="true"></span>
+      <span class="btn-icon" aria-hidden="true">
+        <svg viewBox="0 0 24 24">
+          <circle cx="11" cy="11" r="8" />
+          <line x1="21" y1="21" x2="16.65" y2="16.65" />
+        </svg>
+      </span>
+      <span class="btn-label">Analyse Bowl</span>
+    </button>
+
+    <!-- =====================================================
+         RESULTS
+         ===================================================== -->
+    <section class="results-section" id="results-section" aria-label="Analysis results" aria-live="polite">
+
+      <div class="results-header">
+        <span class="results-title-text">Results</span>
+        <span class="tadka-result-badge" id="tadka-result-badge"></span>
+      </div>
+
+      <!-- Row 1: Water · Protein · Calories -->
+      <div class="stat-cards">
+
+        <div class="stat-card card-water" id="card-water">
+          <span class="card-label">Water<br>content</span>
+          <span class="card-value">
+            <span id="result-water">—</span><span class="unit">%</span>
+          </span>
+        </div>
+
+        <div class="stat-card card-protein" id="card-protein">
+          <span class="card-label">Protein /<br>100g</span>
+          <span class="card-value">
+            <span id="result-protein">—</span><span class="unit">g</span>
+          </span>
+        </div>
+
+        <div class="stat-card card-calories" id="card-calories">
+          <span class="card-label">Calories /<br>100g</span>
+          <span class="card-value">
+            <span id="result-calories">—</span><span class="unit">kcal</span>
+          </span>
+        </div>
+
+      </div>
+
+      <!-- Row 2: Carbs · Fat · Fiber -->
+      <div class="stat-cards-row2">
+
+        <div class="stat-card card-carbs" id="card-carbs">
+          <span class="card-label">Carbs /<br>100g</span>
+          <span class="card-value">
+            <span id="result-carbs">—</span><span class="unit">g</span>
+          </span>
+        </div>
+
+        <div class="stat-card card-fat" id="card-fat">
+          <span class="card-label">Fat /<br>100g</span>
+          <span class="card-value">
+            <span id="result-fat">—</span><span class="unit">g</span>
+          </span>
+        </div>
+
+        <div class="stat-card card-fiber" id="card-fiber">
+          <span class="card-label">Fiber /<br>100g</span>
+          <span class="card-value">
+            <span id="result-fiber">—</span><span class="unit">g</span>
+          </span>
+        </div>
+
+      </div>
+
+    </section>
+
+    <!-- Footer -->
+    <footer class="page-footer" role="contentinfo">
+      Navdhi Advanced Pulse Analyser
+    </footer>
+
+  </div><!-- /.page-wrap -->
+
+
+  <!-- =====================================================
+       SCRIPT — logic only, zero styling here
+       ===================================================== -->
+  <script>
+    /* -------------------------------------------------------
+       CONFIG — change this one line when your tunnel URL changes
+       ------------------------------------------------------- */
+    const API_URL = " https://valves-companion-brass-subscriptions.trycloudflare.com/analyse";
+    // ^ Update this URL after running 05_tunnel.ps1
+    /* ------------------------------------------------------- */
+
+    /* Element refs */
+    const uploadZone = document.getElementById('upload-zone');
+    const imageInput = document.getElementById('image-input');
+    const uploadPreview = document.getElementById('upload-preview');
+    const previewImg = document.getElementById('preview-img');
+    const removeBtn = document.getElementById('remove-btn');
+    const tadkaToggle = document.getElementById('tadka-toggle');
+    const analyseBtn = document.getElementById('analyse-btn');
+    const statusMsg = document.getElementById('status-msg');
+    const loadingOverlay = document.getElementById('loading-overlay');
+    const resultsSection = document.getElementById('results-section');
+    const tadkaResultBadge = document.getElementById('tadka-result-badge');
+
+    /* Nutrition output refs */
+    const outWater = document.getElementById('result-water');
+    const outProtein = document.getElementById('result-protein');
+    const outCalories = document.getElementById('result-calories');
+    const outCarbs = document.getElementById('result-carbs');
+    const outFat = document.getElementById('result-fat');
+    const outFiber = document.getElementById('result-fiber');
+
+    let selectedFile = null;
+
+    /* ---- Drag & drop ---- */
+    uploadZone.addEventListener('dragover', (e) => {
+      e.preventDefault();
+      uploadZone.classList.add('drag-over');
+    });
+    uploadZone.addEventListener('dragleave', () => uploadZone.classList.remove('drag-over'));
+    uploadZone.addEventListener('drop', (e) => {
+      e.preventDefault();
+      uploadZone.classList.remove('drag-over');
+      const f = e.dataTransfer.files[0];
+      if (f && f.type.startsWith('image/')) setFile(f);
+      else showError('Please drop an image file (JPG, PNG, or WEBP).');
+    });
+
+    /* ---- File input ---- */
+    imageInput.addEventListener('change', () => {
+      if (imageInput.files[0]) setFile(imageInput.files[0]);
+    });
+
+    /* ---- Set file ---- */
+    function setFile(file) {
+      selectedFile = file;
+      clearStatus();
+      const url = URL.createObjectURL(file);
+      previewImg.src = url;
+      previewImg.onload = () => URL.revokeObjectURL(url);
+      uploadPreview.style.display = 'block';
+      hideResults();
+    }
+
+    /* ---- Remove file ---- */
+    removeBtn.addEventListener('click', (e) => {
+      e.stopPropagation();       // don't re-trigger the file input
+      selectedFile = null;
+      imageInput.value = '';
+      previewImg.src = '';
+      uploadPreview.style.display = 'none';
+      hideResults();
+      clearStatus();
+    });
+
+    /* ---- Status helpers ---- */
+    function showError(msg) {
+      statusMsg.className = 'status-msg error';
+      statusMsg.textContent = msg;
+      statusMsg.style.display = 'block';
+    }
+    function clearStatus() {
+      statusMsg.style.display = 'none';
+      statusMsg.textContent = '';
+    }
+
+    /* ---- Results ---- */
+    function hideResults() { resultsSection.style.display = 'none'; }
+
+    function showResults(data) {
+      // Server returns flat JSON: { water_percent, calories, protein_g, carbs_g, fat_g, fiber_g, tadka }
+      outWater.textContent = fmt(data.water_percent);
+      outProtein.textContent = fmt(data.protein_g);
+      outCalories.textContent = fmt(data.calories);
+      outCarbs.textContent = fmt(data.carbs_g);
+      outFat.textContent = fmt(data.fat_g);
+      outFiber.textContent = fmt(data.fiber_g);
+
+      if (data.tadka) {
+        tadkaResultBadge.className = 'tadka-result-badge on';
+        tadkaResultBadge.textContent = '\uD83D\uDD25 Tadka';
+      } else {
+        tadkaResultBadge.className = 'tadka-result-badge off';
+        tadkaResultBadge.textContent = 'No tadka';
+      }
+
+      resultsSection.style.display = 'block';
+      resultsSection.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+    }
+
+    function fmt(v) {
+      if (typeof v !== 'number') return '—';
+      return parseFloat(v.toFixed(1)).toString();
+    }
+
+    /* ---- Analyse ---- */
+    analyseBtn.addEventListener('click', async () => {
+      clearStatus();
+
+      if (!selectedFile) {
+        showError('Please select or capture a photo of your dal bowl first.');
+        return;
+      }
+
+      /* Show loading */
+      loadingOverlay.classList.add('active');
+      analyseBtn.disabled = true;
+      hideResults();
+
+      const formData = new FormData();
+      formData.append('image', selectedFile);
+      formData.append('tadka', tadkaToggle.checked ? 'true' : 'false');
+
+      try {
+        const res = await fetch(API_URL, { method: 'POST', body: formData });
+
+        if (!res.ok) {
+          let detail = '';
+          try { const b = await res.json(); detail = b.error || b.message || ''; } catch (_) { }
+          throw new Error(`Server error ${res.status}${detail ? ': ' + detail : ''}.`);
+        }
+
+        const data = await res.json();
+        showResults(data);
+
+      } catch (err) {
+        const isNetwork = err instanceof TypeError;
+        showError(
+          isNetwork
+            ? 'Network error — could not reach the server. Check your connection or the API URL.'
+            : (err.message || 'An unexpected error occurred. Please try again.')
+        );
+      } finally {
+        loadingOverlay.classList.remove('active');
+        analyseBtn.disabled = false;
+      }
+    });
+
+    /* Helper: visually-hidden label */
+  </script>
+
+  <style>
+    .visually-hidden {
+      position: absolute;
+      width: 1px;
+      height: 1px;
+      overflow: hidden;
+      clip: rect(0, 0, 0, 0);
+      white-space: nowrap;
+    }
+  </style>
+</body>
+
+</html>
